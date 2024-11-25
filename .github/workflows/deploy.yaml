@@ -6,19 +6,32 @@ on:
             - main
 
 jobs:
-    build:
+    test:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
 
             # build test image (for client project)
-            - run: docker build -t phinguyen/complex-react-client-test -f ./client/Dockerfile.dev ./client
+            - name: Build Test Image for Client Project
+              run: docker build -t phinguyen/complex-react-client-test -f ./client/Dockerfile.dev ./client
 
             # use test image to run tests (for client project)
-            - run: docker run -e CI=true phinguyen/complex-react-client-test npm test -- --coverage
+            - name: Run Tests for Client Project
+              run: docker run -e CI=true phinguyen/complex-react-client-test npm test -- --coverage
+    build:
+        runs-on: ubuntu-latest
+        needs: test
+        steps:
+            - uses: actions/checkout@v2
+            # build production images for services in parallel
+            - name: Build Production Docker Image for Client
+              run: docker build -t phinguyen/complex-client ./client
 
-            # build production images for services
-            - run: docker build -t phinguyen/complex-client ./client
-            - run: docker build -t phinguyen/complex-nginx ./nginx
-            - run: docker build -t phinguyen/complex-server ./server
-            - run: docker build -t phinguyen/complex-worker ./worker
+            - name: Build Production Docker Image for Nginx
+              run: docker build -t phinguyen/complex-nginx ./nginx
+
+            - name: Build Production Docker Image for Server
+              run: docker build -t phinguyen/complex-server ./server
+
+            - name: Build Production Docker Image for Worker
+              run: docker build -t phinguyen/complex-worker ./worker
