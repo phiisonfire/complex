@@ -13,11 +13,11 @@ jobs:
 
             # build test image (for client project)
             - name: Build Test Image for Client Project
-              run: docker build -t phinguyen/complex-react-client-test -f ./client/Dockerfile.dev ./client
+              run: docker build -t nguyenhongphi2807/complex-react-client-test -f ./client/Dockerfile.dev ./client
 
             # use test image to run tests (for client project)
             - name: Run Tests for Client Project
-              run: docker run -e CI=true phinguyen/complex-react-client-test npm test -- --coverage
+              run: docker run -e CI=true nguyenhongphi2807/complex-react-client-test npm test -- --coverage
     build:
         runs-on: ubuntu-latest
         needs: test
@@ -26,17 +26,17 @@ jobs:
             # build production images for services in parallel
             - name: Build Production Docker Images for services
               run: |
-                docker build -t phinguyen/complex-client ./client
-                docker build -t phinguyen/complex-nginx ./nginx
-                docker build -t phinguyen/complex-server ./server
-                docker build -t phinguyen/complex-worker ./worker
+                docker build -t nguyenhongphi2807/complex-client ./client
+                docker build -t nguyenhongphi2807/complex-nginx ./nginx
+                docker build -t nguyenhongphi2807/complex-server ./server
+                docker build -t nguyenhongphi2807/complex-worker ./worker
 
             - name: Login to Docker Hub using Docker CLI & Github Action Secrets
               run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_ID }}" --password-stdin
 
             - name: Push Production Docker Images into Docker Hub
               run: |
-                docker push phinguyen/complex-client
-                docker push phinguyen/complex-nginx
-                docker push phinguyen/complex-server
-                docker push phinguyen/complex-worker
+                docker push nguyenhongphi2807/complex-client
+                docker push nguyenhongphi2807/complex-nginx
+                docker push nguyenhongphi2807/complex-server
+                docker push nguyenhongphi2807/complex-worker
