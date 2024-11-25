@@ -24,14 +24,19 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             # build production images for services in parallel
-            - name: Build Production Docker Image for Client
-              run: docker build -t phinguyen/complex-client ./client
+            - name: Build Production Docker Images for services
+              run: |
+                docker build -t phinguyen/complex-client ./client
+                docker build -t phinguyen/complex-nginx ./nginx
+                docker build -t phinguyen/complex-server ./server
+                docker build -t phinguyen/complex-worker ./worker
 
-            - name: Build Production Docker Image for Nginx
-              run: docker build -t phinguyen/complex-nginx ./nginx
+            - name: Login to Docker Hub using Docker CLI & Github Action Secrets
+              run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_ID }}" --password-stdin
 
-            - name: Build Production Docker Image for Server
-              run: docker build -t phinguyen/complex-server ./server
-
-            - name: Build Production Docker Image for Worker
-              run: docker build -t phinguyen/complex-worker ./worker
+            - name: Push Production Docker Images into Docker Hub
+              run: |
+                docker push phinguyen/complex-client
+                docker push phinguyen/complex-nginx
+                docker push phinguyen/complex-server
+                docker push phinguyen/complex-worker
