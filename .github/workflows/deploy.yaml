@@ -1,0 +1,24 @@
+name: Deploy Multi-Container Docker Project
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            # build test image (for client project)
+            - run: docker build -t phinguyen/complex-react-client-test -f ./client/Dockerfile.dev ./client
+
+            # use test image to run tests (for client project)
+            - run: docker run -e CI=true phinguyen/complex-react-client-test npm test -- --coverage
+
+            # build production images for services
+            - run: docker build -t phinguyen/complex-client ./client
+            - run: docker build -t phinguyen/complex-nginx ./nginx
+            - run: docker build -t phinguyen/complex-server ./server
+            - run: docker build -t phinguyen/complex-worker ./worker
